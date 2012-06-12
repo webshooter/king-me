@@ -1,0 +1,54 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>King Me!</title>
+
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-touch-fullscreen" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+  <link rel="stylesheet" href="css/main.css"/>
+
+  <style>
+
+  </style>
+
+</head>
+
+<body>
+
+  <header></header>
+
+
+  <footer></footer>
+
+  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="js/jquery-1.7.2.min.js"><\/script>')</script>
+  <script type="text/javascript" src="js/game.js"></script>
+  <script type="text/javascript" src="js/board.js"></script>
+  <script type="text/javascript" src="js/square.js"></script>
+  <script type="text/javascript" src="js/checker.js"></script>
+  <script type="text/javascript" src="js/utilities.js"></script>
+  <script type="text/javascript" src="js/eventhandlers.js"></script>
+  <script>
+  const HIGHLIGHTCOLOR = "rgb(255,0,0)";
+  var _currentChecker = null;
+  var _currentSelectedSquare = null;
+  var board;
+  $(document).ready( function() {
+    var boardOpts = {
+        width:400,
+        height:400,
+        xOffset:10,
+        yOffset:10
+    };
+    board = new Board(document.body, boardOpts);
+    document.getElementById(board.canvas.id).addEventListener("click", canvasClick, false);
+  });
+  
+  </script>
+
+</body>
+</html>
