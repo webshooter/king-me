@@ -1,8 +1,5 @@
 /* BOARD.JS */
 
-/* #########################################################
-   # BOARD
-   ######################################################### */
 function Board(containerElement, options) {
     // set properties = options || defaults
     this.id          = options.id            || "gameboard";
@@ -30,32 +27,30 @@ function Board(containerElement, options) {
     
     containerElement.appendChild(this.canvas);
 };
-Board.prototype.getColumnTags = function() {
-    return ["A","B","C","D","E","F","G","H"];
-};
-Board.prototype.getRowTags = function() {
-    return ["1","2","3","4","5","6","7","8"];
-};
 Board.prototype.initCheckers = function() {
-    this.checkers = [];
+    this.checkers = []; // initialize the array
+    
     var playerOneColor = "rgb(255,255,0)";
     var playerTwoColor = "rgb(0,255,255)";
-    var playerOneSquares = ["B1","D1","F1","H1","A2","C2","E2","G2","B3","D3","F3","H3"];
-    var playerTwoSquares = ["A6","C6","E6","G6","B7","D7","F7","H7","A8","C8","E8","G8"];
-    var checker;
-
-    for (var i=0; i<playerOneSquares.length; i++) {
-        var mysquare = this.getSquareById(playerOneSquares[i]);
-        checker = new Checker(this.getSquareById(playerOneSquares[i]), playerOneColor);
-        this.checkers.push(checker);
+    
+    
+    // player one checkers
+    for (var i=1; i<=12; i++) {
+      var checker = new Checker(this.getSquareById(i), playerOneColor);
+      this.checkers.push(checker);
     }
-    for (var i=0; i<playerTwoSquares.length; i++) {
-        checker = new Checker(this.getSquareById(playerTwoSquares[i]), playerTwoColor);
-        this.checkers.push(checker);
+    
+    // player two checkers
+    for (var i=21; i<=32; i++) {
+      var checker = new Checker(this.getSquareById(i), playerTwoColor);
+      this.checkers.push(checker);
     }
 };
 Board.prototype.draw = function() {
     // board color and border are set in css
+    
+    // clear the current board
+    this.clear();
     
     // draw squares
     this.drawSquares();
@@ -69,27 +64,27 @@ Board.prototype.draw = function() {
     this.drawCheckers();
     
 };
-Board.prototype.drawSquares = function(x) {
-    var colTags = this.getColumnTags();
-    var rowTags = this.getRowTags();
+Board.prototype.clear = function() {
+  this.context.clearRect(0,0,this.width, this.height);
+};
+Board.prototype.drawSquares = function() {
     var sqSize = {
         tall: (parseInt(this.canvas.height) / this.rowCount),
         wide: (parseInt(this.canvas.width) / this.colCount)
     };
-    for (var row=0; row<rowTags.length; row++) {
-        for (var col=0; col<this.colCount; col+=2) {
-            var idRow = rowTags[(rowTags.length-row)-1];
-            var idCol = colTags[col];
-            x = sqSize.wide * col;
-            y = sqSize.tall * row;
-            if ((row+1) % 2 == 0) {
-                x += sqSize.wide;
-                idCol = colTags[col+1];
-            }
-            var sq = new Square(x, y, sqSize, this, this.squareColor);
-            sq.id = idCol + idRow;
-            if (sq) { this.squares.push(sq); }
-        }
+    var x = 0, 
+        y = 0,
+        xOffset = false;
+    for (var i=32; i>0; i--) {
+      var sq = new Square(x, y, sqSize, this, this.squareColor);
+      sq.id = i;
+      if (sq) { this.squares.push(sq); }
+      x += sqSize.wide * 2;
+      if (x > sqSize.wide * 7) {
+        y += sqSize.tall;
+        xOffset = !xOffset;
+        x = (xOffset) ? sqSize.wide : 0;
+      }
     }
 }
 Board.prototype.drawCheckers = function() {
@@ -97,15 +92,16 @@ Board.prototype.drawCheckers = function() {
         for (var i=0; i<this.checkers.length; i++) {
             this.checkers[i].draw();
         }
-        //printCheckers(this.checkers);
     }
 }
 Board.prototype.getSquareById = function(squareId) {
+    var square = null;
     for (var i=0; i<this.squares.length; i++) {
-        if (this.squares[i].id.toUpperCase() == squareId.toUpperCase()) {
-            return this.squares[i];
-        }
+      if (this.squares[i].id == squareId) {
+        square = this.squares[i];
+      }
     }
+    return square;
 };
 Board.prototype.getSquareByCoord = function(x, y) {
     //loop through all the objects in squares[]
@@ -140,3 +136,4 @@ Board.prototype.moveChecker = function(checker, fromSquare, toSquare) {
     fromSquare.clear();
     this.draw();
 };
+

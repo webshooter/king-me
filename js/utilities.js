@@ -1,57 +1,39 @@
 /* UTILITIES.JS */
 
-/* #########################################################
-   # UTILITY FUNCTIONS
-   ######################################################### */
-
 function clickSquare(square) {
     
-    //var info;
-    //info = {
-    //    currentchecker: _currentChecker,
-    //    squareid: square.id,
-    //    haschecker: square.hasChecker()
-    //};
-    //console.log(info);
+    // just for debugging
+    if (square.hasChecker()) {
+      console.log("[" + _currentChecker + "] square id: " + square.id + ", checker id: " + square.checker.id);
+    } else {
+      console.log("[" + _currentChecker + "] square id: " + square.id + ", no checker.")
+    }
+    ////////////////////////////
     
     if (square.hasChecker()) {
-        square.checker.determineValidMoves();
-        //console.log("A - has checker");
-        if (_currentChecker != null) {
-            //console.log("1 - _currentChecker is not null");
-            if (_currentChecker.id == square.checker.id) {
-                //console.log("a - selected checker is not _currentChecker");
-                // unselect square/checker
-                _currentChecker = null;
-                square.highlightSelected(false);
-            } else {
-                //console.log("b - selected checker IS _currentChecker");
-                // select new square/checker
-                _currentChecker = square.checker;
-                square.highlightSelected(true, HIGHLIGHTCOLOR);
-            }
+      // clicked an active game square that has a checker
+      if (_currentChecker != null) {
+        if (_currentChecker.id == square.checker.id) {
+          // unselect previously selected square/checker
+          _currentChecker = null;
+          square.highlightSelected(false);
         } else {
-            //console.log("2 - _currentChecker IS null");
-            // select a square/checker
-            _currentChecker = square.checker;
-            square.highlightSelected(true, HIGHLIGHTCOLOR);
+          // select new square/checker
+          console.log("!");
+          _currentChecker = square.checker;
+          square.highlightSelected(true, HIGHLIGHTCOLOR);
         }
+      } else {
+        // selected a new square/checker
+        _currentChecker = square.checker;
+        square.highlightSelected(true, HIGHLIGHTCOLOR);
+      }
     } else {
-        //console.log("B - has NO checker");
-        if (_currentChecker != null) {
-            //console.log("1 - and _currentChecker is NOT null");
-            square.board.moveChecker(_currentChecker, _currentChecker.square, square);
-            _currentChecker = null;
-        }
+      // clicked an active game square that has NO checker
+      if (_currentChecker != null) {
+        // move currently selected checker to newly selected square
+        aniMoveChecker(_currentChecker, square);
+        _currentChecker = null;
+      }
     }    
-}
-
-
-
-function printCheckers(arr) {
-    var info = "";
-    for (var i=0; i<arr.length; i++) {
-        info +="[" + i + "]" + arr[i].square.id + " ";
-    }
-    console.log(info);
 }

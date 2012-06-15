@@ -10,9 +10,8 @@ function canvasClick(event) {
         sq = board.getSquareByCoord(event.clientX, event.clientY);
         if (sq) {
             clickSquare(sq);
-        } else {
-            //console.log("Not an active game square!");
         }
         return;
     }
 }
+
