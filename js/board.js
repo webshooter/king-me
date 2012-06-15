@@ -126,6 +126,7 @@ Board.prototype.removeChecker = function(square) {
     }
     if (indexToRemove != -1) {
         this.checkers.splice(indexToRemove, 1);
+        square.checker = null;
     }
 };
 Board.prototype.moveChecker = function(checker, fromSquare, toSquare) {
