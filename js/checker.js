@@ -1,8 +1,5 @@
 /* CHECKER.JS */
 
-/* #########################################################
-   # CHECKER
-   ######################################################### */
 function Checker(square, color) {
     // set options
     this.square = square;
