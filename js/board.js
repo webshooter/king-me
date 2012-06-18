@@ -1,27 +1,42 @@
 /* BOARD.JS */
 
-function Board(containerElement, options) {
+function Board(game, containerElement, options) {
     // set properties = options || defaults
-    this.id          = options.id            || "gameboard";
-    this.width       = options.width         || 600;
-    this.height      = options.height        || 600;
-    this.rowCount    = options.rowCount      || 8;
-    this.colCount    = options.colCount      || 8;
-    this.squareColor = options.squareColor   || "rgb(100,100,100)";
-    this.yOffset     = options.yOffset       || 0;
-    this.xOffset     = options.xOffset       || 0;
+    this.game        = options.game;
+    this.id          = options.id;
+    this.width       = options.width;
+    this.height      = options.height;
+    this.rowCount    = options.rowCount;
+    this.colCount    = options.colCount;
+    this.squareColor = options.squareColor;
+    this.boardBg     = options.boardBg;
+    this.borderWidth = options.borderWidth;
+    this.borderStyle = options.borderStyle;
+    this.borderColor = options.borderColor;
+    
+    if (options == null) {
+      console.log("Board options cannot be null");
+      return;
+    }
     
     // object collections
     this.squares  = [];
     this.checkers = [];
     
+    // handle DOM stuff
     this.canvas = document.createElement("canvas");
     this.canvas.setAttribute("id", this.id);
     this.canvas.width = this.width;
     this.canvas.height = this.height;
     this.context = this.canvas.getContext("2d");
+    //this.canvas.style.position = "relative";
+    this.canvas.setAttribute("style", "border-width:" + this.borderWidth + 
+        "px; border-color:" + this.borderColor + "; border-style:" + 
+        this.borderStyle + "; background-color:" + this.boardBg + ";");
 
     this.$$ = $(this.canvas); // just for convenient jquery access
+    
+    console.log(this.canvas.style.position);
     
     this.draw();
     
@@ -36,13 +51,13 @@ Board.prototype.initCheckers = function() {
     
     // player one checkers
     for (var i=1; i<=12; i++) {
-      var checker = new Checker(this.getSquareById(i), playerOneColor);
+      var checker = new Checker(this.getSquareById(i), this.game.playerOne);
       this.checkers.push(checker);
     }
     
     // player two checkers
     for (var i=21; i<=32; i++) {
-      var checker = new Checker(this.getSquareById(i), playerTwoColor);
+      var checker = new Checker(this.getSquareById(i), this.game.playerTwo);
       this.checkers.push(checker);
     }
 };
@@ -72,15 +87,16 @@ Board.prototype.drawSquares = function() {
         tall: (parseInt(this.canvas.height) / this.rowCount),
         wide: (parseInt(this.canvas.width) / this.colCount)
     };
+    var squareCount = (this.colCount/2) * this.rowCount;
     var x = 0, 
         y = 0,
         xOffset = false;
-    for (var i=32; i>0; i--) {
+    for (var i=squareCount; i>0; i--) {
       var sq = new Square(x, y, sqSize, this, this.squareColor);
       sq.id = i;
       if (sq) { this.squares.push(sq); }
       x += sqSize.wide * 2;
-      if (x > sqSize.wide * 7) {
+      if (x > sqSize.wide * this.colCount-1) {
         y += sqSize.tall;
         xOffset = !xOffset;
         x = (xOffset) ? sqSize.wide : 0;
@@ -107,9 +123,9 @@ Board.prototype.getSquareByCoord = function(x, y) {
     //loop through all the objects in squares[]
     for (var i=0; i<this.squares.length; i++) {
         // check to see if the mousex value is "in the square"
-        if ((parseInt(x) > (parseInt(this.squares[i].x)) + this.xOffset) && (parseInt(x) < (parseInt(this.squares[i].x) + this.xOffset) + parseInt(this.squares[i].size.wide))) {
+        if ((parseInt(x) > (parseInt(this.squares[i].x)) + this.borderWidth) && (parseInt(x) < (parseInt(this.squares[i].x) + this.borderWidth) + parseInt(this.squares[i].size.wide))) {
             // check to see if the mousey value is "in the square"
-            if ((y > (parseInt(this.squares[i].y)) + this.yOffset) && (y < (parseInt(this.squares[i].y) + this.yOffset) + parseInt(this.squares[i].size.tall))) {
+            if ((y > (parseInt(this.squares[i].y)) + this.borderWidth) && (y < (parseInt(this.squares[i].y) + this.borderWidth) + parseInt(this.squares[i].size.tall))) {
                 // mousex and mousey are both in the square,
                 // so this must be the square[] object we want
                 return this.squares[i];
