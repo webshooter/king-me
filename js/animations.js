@@ -25,8 +25,17 @@ function aniMoveChecker(checker, square) {
             stepX = 2,
             stepY = 2;
         
-        if (dX < 0) { stepX = -2 };
-        if (dY < 0) { stepY = -2 };
+        var absX = Math.abs((checker.square.x + checker.square.size.wide/2)-(targetX)) ,
+            absY = Math.abs((checker.square.y + checker.square.size.tall/2)-(targetY));
+        if (Math.abs(dX) < (absX*0.1) || Math.abs(dX) > (absX*0.9)) {
+          stepX = 1;
+        }
+        if (Math.abs(dY) < (absY*0.1) || Math.abs(dY) > (absY*0.9)) {
+          stepY = 1;
+        }
+        
+        if (dX < 0) { stepX = stepX*(-1) };
+        if (dY < 0) { stepY = stepY*(-1) };
 
         if (currentX != targetX) {
           checker.x += stepX; 
@@ -34,6 +43,8 @@ function aniMoveChecker(checker, square) {
         if (currentY != targetY) {
           checker.y += stepY;
         }
+
+        //console.log("x:" + checker.x + ", y:" + checker.y);
 
         // redraw board
         brd.draw();
