@@ -24,6 +24,7 @@
   <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
   <script>window.jQuery || document.write('<script src="js/jquery-1.7.2.min.js"><\/script>')</script>
   <script type="text/javascript" src="js/game.js"></script>
+  <script type="text/javascript" src="js/player.js"></script>
   <script type="text/javascript" src="js/board.js"></script>
   <script type="text/javascript" src="js/square.js"></script>
   <script type="text/javascript" src="js/checker.js"></script>
@@ -34,16 +35,22 @@
   const HIGHLIGHTCOLOR = "rgb(255,0,0)";
   var _currentChecker = null;
   var _currentSelectedSquare = null;
-  var board;
+  //var board;
+  var game;
   $(document).ready( function() {
-    var boardOpts = {
-        width:400,
-        height:400,
-        xOffset:10,
-        yOffset:10
-    };
-    board = new Board(document.body, boardOpts);
-    document.getElementById(board.canvas.id).addEventListener("click", canvasClick, false);
+  //  var boardOpts = {
+  //      width:400,
+  //      height:400,
+  //      xOffset:10,
+  //      yOffset:10
+  //  };
+  //  board = new Board(document.body, boardOpts);
+  game = new Game();
+  game.initialize();
+  document.getElementById(game.board.canvas.id).addEventListener("click", canvasClick, false);
+  //document.getElementById(board.canvas.id).addEventListener("click", canvasClick, false);
+  //var player = new Player();
+  //console.log(player.getId());
   });
   
   </script>
