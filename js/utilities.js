@@ -36,4 +36,15 @@ function clickSquare(square) {
         _currentChecker = null;
       }
     }    
+    
+}
+
+function getId(idLength) {
+  var id = "";
+      pool = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
+  for (var i=0; i<idLength ;i++) {
+    var rnd = Math.floor(Math.random() * (pool.length));
+    id += pool.substring(rnd, rnd+1);
+  }
+  return id;
 }

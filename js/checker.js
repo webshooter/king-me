@@ -1,17 +1,18 @@
 /* CHECKER.JS */
 
-function Checker(square, color) {
+function Checker(square, player) {
     // set options
     this.square = square;
     this.id = this.square.id;
-    this.color = color;
+    this.playerid = player.id;
+    this.color = player.color;
     this.isKing = false;
     this.context = (this.square) ? this.square.context : null;
     this.x = (this.square) ? parseFloat(square.x) + parseFloat(this.square.size.wide/2) : 0;
     this.y = (this.square) ? parseFloat(square.y) + parseFloat(this.square.size.tall/2) : 0;
     this.size = (this.square) ? parseFloat(this.square.size.wide*0.4) : 0;
     this.square.checker = this;
-    this.validMoves = [];
+    this.validMoves = [];    
 };
 Checker.prototype.draw = function() {
     this.context.beginPath();
@@ -27,5 +28,32 @@ Checker.prototype.draw = function() {
     this.context.stroke();
 };
 Checker.prototype.determineValidMoves = function() {
-    //     
+
+    var moves = {
+      MFR: 4,
+      MFL: 5,
+      JFR: 7,
+      JFL: 9,
+      MBL: -3,
+      MBR: -4,
+      JBL: -7,
+      JBR: -9
+    };
+    
+    var sqDest = null;
+        sqOrig = this.square,
+        brd = sqOrig.board;
+            
+    if (!this.isKing) {
+      
+      sqDest = brd.getSquareById(parseInt(sqOrig.id) + parseInt(moves.MFR));
+      if (sqDest != null) {
+        //if (sqDest.hasChecker)
+      }
+      
+      
+    }
 };
+
+
+

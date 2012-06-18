@@ -6,8 +6,8 @@
 function canvasClick(event) {
     event.preventDefault();
     var sq;
-    if (board) {
-        sq = board.getSquareByCoord(event.clientX, event.clientY);
+    if (game.board) {
+        sq = game.board.getSquareByCoord(event.clientX, event.clientY);
         if (sq) {
             clickSquare(sq);
         }
