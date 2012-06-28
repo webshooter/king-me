@@ -1,95 +1,46 @@
 /* BOARD.JS */
 
-function Board(game, containerElement, options) {
-    // set properties = options || defaults
-    this.game        = options.game;
-    this.id          = options.id;
-    this.width       = options.width;
-    this.height      = options.height;
-    this.rowCount    = options.rowCount;
-    this.colCount    = options.colCount;
-    this.squareColor = options.squareColor;
-    this.boardBg     = options.boardBg;
-    this.borderWidth = options.borderWidth;
-    this.borderStyle = options.borderStyle;
-    this.borderColor = options.borderColor;
+function Board(options) {
+  
+  if (options == null) {
+    console.log("Board options cannot be null. Exiting...");
+    return;
+  }
+  
+  // load options
+  this.game = options.game;
+  this.x = options.x || 0;
+  this.y = options.y || 0;
+  this.width = options.width;
+  this.height = options.height;
+  this.squareColor = options.squareColor;
+  this.color = options.boardColor;
+  this.showBorder = options.showBorder;
+  this.borderWidth = options.borderWidth;
+  this.borderStyle = options.borderStyle;
+  this.borderColor = options.borderColor;
+  this.checkerSize = options.checkerSize;
+  
+  // set other properties
+  this.selectedSquare = null;
+  this.rowCount = 8;
+  this.colCount = 8;
     
-    if (options == null) {
-      console.log("Board options cannot be null");
-      return;
-    }
-    
-    // object collections
-    this.squares  = [];
-    this.checkers = [];
-    
-    // handle DOM stuff
-    this.canvas = document.createElement("canvas");
-    this.canvas.setAttribute("id", this.id);
-    this.canvas.width = this.width;
-    this.canvas.height = this.height;
-    this.context = this.canvas.getContext("2d");
-    //this.canvas.style.position = "relative";
-    this.canvas.setAttribute("style", "border-width:" + this.borderWidth + 
-        "px; border-color:" + this.borderColor + "; border-style:" + 
-        this.borderStyle + "; background-color:" + this.boardBg + ";");
+  // object collections
+  this.squares  = [];
+  this.checkers = [];
+  
+  
 
-    this.$$ = $(this.canvas); // just for convenient jquery access
-    
-    console.log(this.canvas.style.position);
-    
-    this.draw();
-    
-    containerElement.appendChild(this.canvas);
-};
-Board.prototype.initCheckers = function() {
-    this.checkers = []; // initialize the array
-    
-    var playerOneColor = "rgb(255,255,0)";
-    var playerTwoColor = "rgb(0,255,255)";
-    
-    
-    // player one checkers
-    for (var i=1; i<=12; i++) {
-      var checker = new Checker(this.getSquareById(i), this.game.playerOne);
-      this.checkers.push(checker);
-    }
-    
-    // player two checkers
-    for (var i=21; i<=32; i++) {
-      var checker = new Checker(this.getSquareById(i), this.game.playerTwo);
-      this.checkers.push(checker);
-    }
-};
-Board.prototype.draw = function() {
-    // board color and border are set in css
-    
-    // clear the current board
-    this.clear();
-    
-    // draw squares
-    this.drawSquares();
-    
-    // draw checkers
-    if (this.checkers.length < 1) {
-        // Note: This should really be handled in a 
-        // game init routine, not here
-        this.initCheckers();
-    }
-    this.drawCheckers();
-    
-};
-Board.prototype.clear = function() {
-  this.context.clearRect(0,0,this.width, this.height);
-};
-Board.prototype.drawSquares = function() {
+  this.init = function() {
+    // create squares
     var sqSize = {
-        tall: (parseInt(this.canvas.height) / this.rowCount),
-        wide: (parseInt(this.canvas.width) / this.colCount)
+      tall: (parseInt(this.height-this.borderWidth) / this.rowCount),
+      wide: (parseInt(this.width-this.borderWidth) / this.colCount)
     };
     var squareCount = (this.colCount/2) * this.rowCount;
-    var x = 0, 
-        y = 0,
+    var x = this.borderWidth/2, 
+        y = this.borderWidth/2,
         xOffset = false;
     for (var i=squareCount; i>0; i--) {
       var sq = new Square(x, y, sqSize, this, this.squareColor);
@@ -99,18 +50,48 @@ Board.prototype.drawSquares = function() {
       if (x > sqSize.wide * this.colCount-1) {
         y += sqSize.tall;
         xOffset = !xOffset;
-        x = (xOffset) ? sqSize.wide : 0;
+        x = (xOffset) ? sqSize.wide + this.borderWidth/2 : this.borderWidth/2;
       }
     }
-}
-Board.prototype.drawCheckers = function() {
-    if (this.checkers.length > 0) {
-        for (var i=0; i<this.checkers.length; i++) {
-            this.checkers[i].draw();
+  };
+
+  this.setGameState = function(gameState) {
+      if (gameState != null && (gameState.length == this.squares.length)) {
+        var chars = gameState.split("");
+        for (var i=0; i<chars.length; i++) {
+          if (chars[i] > 0) {
+            var checker = new Checker(this.getSquareById(i+1));
+            checker.setSize(this.game.getBoardPrefs().checkerSize);
+            switch (parseInt(chars[i])) {
+              case 1:  // [1] player checker (non-promoted)
+                //console.log("[1][" + )
+                checker.playerid = this.game.getData().playerid;
+                checker.color = this.game.getColorPrefs().myColor;
+                checker.isKing = false;
+                break;
+              case 2:  // [2] opponent checker (non-promoted)
+                checker.playerid = this.game.getData().opponentid;
+                checker.color = this.game.getColorPrefs().opponentColor;
+                checker.isKing = false;
+                break;
+              case 3:  // [3] player checker (promoted)
+                checker.playerid = this.game.getData().playerid;
+                checker.color = this.game.getColorPrefs().myColor;
+                checker.isKing = true;
+                break;
+              case 4:  // [4] opponent checker (promoted)
+                checker.playerid = this.game.getData().opponentid;
+                checker.color = this.game.getColorPrefs().opponentColor;
+                checker.isKing = true;
+                break;
+            }
+            this.checkers.push(checker);
+          }
         }
-    }
-}
-Board.prototype.getSquareById = function(squareId) {
+      }
+    };
+  
+  this.getSquareById = function(squareId) {
     var square = null;
     for (var i=0; i<this.squares.length; i++) {
       if (this.squares[i].id == squareId) {
@@ -118,39 +99,79 @@ Board.prototype.getSquareById = function(squareId) {
       }
     }
     return square;
-};
-Board.prototype.getSquareByCoord = function(x, y) {
-    //loop through all the objects in squares[]
+  };
+  
+  this.getSquareByCoord = function(x, y) {
     for (var i=0; i<this.squares.length; i++) {
-        // check to see if the mousex value is "in the square"
-        if ((parseInt(x) > (parseInt(this.squares[i].x)) + this.borderWidth) && (parseInt(x) < (parseInt(this.squares[i].x) + this.borderWidth) + parseInt(this.squares[i].size.wide))) {
-            // check to see if the mousey value is "in the square"
-            if ((y > (parseInt(this.squares[i].y)) + this.borderWidth) && (y < (parseInt(this.squares[i].y) + this.borderWidth) + parseInt(this.squares[i].size.tall))) {
-                // mousex and mousey are both in the square,
-                // so this must be the square[] object we want
-                return this.squares[i];
+        if ((parseInt(x) > (parseInt(this.squares[i].x)) + (parseInt(this.borderWidth)/2)-1) && 
+            (parseInt(x) < (parseInt(this.squares[i].x) + (parseInt(this.borderWidth)/2)-1) + parseInt(this.squares[i].size.wide))) {
+            if ((y > (parseInt(this.squares[i].y)) + (parseInt(this.borderWidth)/2)-1) && 
+                (y < (parseInt(this.squares[i].y) + (parseInt(this.borderWidth)/2)-1) + parseInt(this.squares[i].size.tall))) {
+              console.log("[" + x + "," + y + "] Square id: " + this.squares[i].id);
+              return this.squares[i];
             }
         }
     }
-};
-Board.prototype.removeChecker = function(square) {
-    var indexToRemove = -1;
-    for (var i=0; i<this.checkers.length; i++) {
-        if (this.checkers[i].square.id == square.id) {
-            indexToRemove = i;
+  };
+  
+  this.getMoves = function(square) {
+                  //|--notpromoted--|---promoted---|
+    var moves=[]; // MFR,MFL,JFR,JFL,MBR,MBL,JBR,JBL
+    moves[0] = [0, 5, 0, 10, 0, 0, 0, 0];
+    moves[1] = [5, 6, 0, 0, 0, 0, 0, 0];
+    moves[2] = [6, 7, 10, 12, 0, 0, 0, 0];
+    moves[3] = [7, 8, 11, 0, 0, 0, 0, 0];
+    moves[4] = [9, 10, 0, 14, 1, 2, 0, 0];
+    moves[5] = [10, 11, 13, 15, 2, 3, 0, 0];
+    moves[6] = [11, 12, 14, 16, 3, 4, 0, 0];
+    moves[7] = [12, 0, 15, 0, 4, 0, 0, 0];
+    moves[8] = [0, 13, 0, 18, 0, 5, 0, 2];
+    moves[9] = [13, 14, 17, 19, 5, 6, 1, 3];
+    moves[10] = [14, 15, 18, 20, 6, 7, 2, 4];
+    moves[11] = [15, 16, 19, 0, 7, 8, 3, 0];
+    moves[12] = [17, 18, 0, 22, 9, 10, 0, 6];
+    moves[13] = [18, 19, 21, 23, 10, 11, 5, 7];
+    moves[14] = [19, 20, 22, 24, 11, 12, 6, 8];
+    moves[15] = [20, 0, 23, 0, 12, 0, 7, 0];
+    moves[16] = [0, 21, 0, 26, 0, 13, 0, 10];
+    moves[17] = [21, 22, 25, 27, 13, 14, 9, 11];
+    moves[18] = [22, 23, 26, 28, 14, 15, 10, 12];
+    moves[19] = [23, 24, 15, 16, 27, 0, 11, 0];
+    moves[20] = [25, 26, 17, 18, 0, 30, 0, 14];
+    moves[21] = [26, 27, 18, 19, 29, 31, 13, 15];
+    moves[22] = [27, 28, 19, 20, 30, 32, 14, 16];
+    moves[23] = [28, 0, 31, 0, 20, 0, 15, 0];
+    moves[24] = [0, 29, 0, 0, 0, 21, 0, 18];
+    moves[25] = [29, 30, 0, 0, 21, 22, 17, 19];
+    moves[26] = [30, 31, 0, 0, 22, 23, 18, 20];
+    moves[27] = [31, 32, 0, 0, 23, 24, 19, 0];
+    moves[28] = [0, 0, 0, 0, 25, 26, 0, 22];
+    moves[29] = [0, 0, 0, 0, 26, 27, 21, 23];
+    moves[30] = [0, 0, 0, 0, 27, 28, 22, 24];
+    moves[31] = [0, 0, 0, 0, 28, 0, 23, 0];
+    if (square) {
+      if (square.id > 0 && square.id < moves.length) {
+        return moves[square.id-1];
+      }
+    }
+    return null;
+  };
+
+  this.getBoardState = function() {
+    var state = "";
+    for (var i=0; i<this.squares.length; i++) {
+      for (var j=0; j<this.squares.length; j++) {
+        if (this.squares[j].id == i) {
+          if (this.squares[j].hasChecker()) {
+            state += "1";
+          } else {
+            state += "0";
+          }
         }
+      }
     }
-    if (indexToRemove != -1) {
-        this.checkers.splice(indexToRemove, 1);
-        square.checker = null;
-    }
+    return state;
+  };
 };
-Board.prototype.moveChecker = function(checker, fromSquare, toSquare) {
-    console.log("moving from " + fromSquare.id + " to " + toSquare.id);
-    var newChecker = new Checker(toSquare, checker.color);
-    this.checkers.push(newChecker);
-    this.removeChecker(fromSquare);
-    fromSquare.clear();
-    this.draw();
-};
+
 

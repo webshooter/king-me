@@ -44,8 +44,6 @@ function aniMoveChecker(checker, square) {
           checker.y += stepY;
         }
 
-        //console.log("x:" + checker.x + ", y:" + checker.y);
-
         // redraw board
         brd.draw();
         

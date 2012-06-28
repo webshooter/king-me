@@ -1,10 +1,13 @@
 /* UTILITIES.JS */
 
 function clickSquare(square) {
+  
+  if (game) {
     
     // just for debugging
     if (square.hasChecker()) {
       console.log("[" + _currentChecker + "] square id: " + square.id + ", checker id: " + square.checker.id);
+      console.log(square.checker);
     } else {
       console.log("[" + _currentChecker + "] square id: " + square.id + ", no checker.")
     }
@@ -19,14 +22,17 @@ function clickSquare(square) {
           square.highlightSelected(false);
         } else {
           // select new square/checker
-          console.log("!");
           _currentChecker = square.checker;
+          //square.checker.determineValidMoves();
           square.highlightSelected(true, HIGHLIGHTCOLOR);
+          square.highlightValidMoves();
+          //_currentChecker.highlightValidMoves(true, "rgb(255,255,255)");
         }
       } else {
         // selected a new square/checker
         _currentChecker = square.checker;
         square.highlightSelected(true, HIGHLIGHTCOLOR);
+        _currentChecker.highlightValidMoves(true, "rgb(255,255,255)");
       }
     } else {
       // clicked an active game square that has NO checker
@@ -35,12 +41,13 @@ function clickSquare(square) {
         aniMoveChecker(_currentChecker, square);
         _currentChecker = null;
       }
-    }    
+    }
+  }
     
 }
 
-function getId(idLength) {
-  var id = "";
+function getRandomId(idLength) {
+  var id = "",
       pool = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXTZabcdefghiklmnopqrstuvwxyz";
   for (var i=0; i<idLength ;i++) {
     var rnd = Math.floor(Math.random() * (pool.length));

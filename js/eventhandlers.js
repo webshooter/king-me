@@ -9,7 +9,8 @@ function canvasClick(event) {
     if (game.board) {
         sq = game.board.getSquareByCoord(event.clientX, event.clientY);
         if (sq) {
-            clickSquare(sq);
+          console.log(game.board.getBoardStateArr());
+          clickSquare(sq);
         }
         return;
     }
