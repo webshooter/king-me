@@ -19,7 +19,8 @@ function Game() {
       _boardPrefs = {},
       _colorPrefs = {},
       _contexts = [];
-      _boardContext = "gameboard";
+      _boardContext = "gameboard",
+      _fxContext = "fx";
   
   // square control states
   var NOTCONTROLLED      = 0,
@@ -50,6 +51,17 @@ function Game() {
         var canvas = document.createElement("canvas");
         var ctx = canvas.getContext("2d");
         canvas.setAttribute("id", options.canvasid);
+        if (options.position) {
+          canvas.style.position = options.position.style;
+          canvas.style.left = options.position.left;
+          canvas.style.top = options.position.top;
+          if (options.zindex || options.zindex == 0) {
+            canvas.style.zIndex = options.zindex;
+          } else {
+            canvas.style.zIndex = _contexts.length;
+          }
+        }        
+        console.log(options.canvasid + ": " + canvas.style.zIndex);
         canvas.height = options.height;
         canvas.width = options.width;
         if (canvas.cssclass) {
@@ -99,6 +111,9 @@ function Game() {
 		  console.log("Either start a new game or load a current game! Exiting...");
 	  }
     
+    var gamespaceElement = document.createElement("div");
+    gamespaceElement.style.position = "relative";
+    
     _playerPrefs = _data.playerPrefs,
     _boardPrefs = _playerPrefs.board,
     _colorPrefs = _playerPrefs.colors;
@@ -123,17 +138,37 @@ function Game() {
     _board.setGameState(_data.boardState);
     this.contexts.clear();
     this.contexts.new({
-      canvasid: "gameboard",
+      canvasid: _boardContext,
+      container: gamespaceElement,
+      position: {
+        style: "absolute",
+        left: 0,
+        top: 0
+      },
       height: 600,
       width: 600,
       add: true
     });
-    
+    this.contexts.new({
+      canvasid: _fxContext,
+      container: gamespaceElement,
+      position: {
+        style: "absolute",
+        left: 0,
+        top: 0
+      },
+      height: 600,
+      width: 600,
+      add: true
+    });
+        
     this.render.board(this.contexts.get(_boardContext));
     
     //this.contexts.get("gameboard").canvas.addEventListener("mousemove", this.hoverHighlight, false);
     this.contexts.get("gameboard").canvas.addEventListener("click", this.boardClick, false);
     //this.contexts.get("gameboard").canvas.addEventListener("mousedown", this.click, false);
+    
+    aniSelection(_board.getSquareById(15), this.contexts.get("fx"));
   };
   
   this.startNew = function() { 
