@@ -1,13 +1,67 @@
-window.requestAnimFrame = (function(callback){    //  TODO:
-    //return window.requestAnimationFrame ||      //  Figure out what is going on
-    //window.webkitRequestAnimationFrame ||       //  with requestAnimationFrame so
-    //window.mozRequestAnimationFrame ||          //  I can better control the  
-    //window.oRequestAnimationFrame ||            //  animation speed and fps
-    //window.msRequestAnimationFrame ||           //
-    return function(callback){
+window.requestAnimFrame = (function(callback){  //  TODO:
+    return window.requestAnimationFrame ||      //  Figure out what is going on
+    window.webkitRequestAnimationFrame  ||      //  with requestAnimationFrame so
+    window.mozRequestAnimationFrame     ||      //  I can better control the  
+    window.oRequestAnimationFrame       ||      //  animation speed and fps
+    window.msRequestAnimationFrame      ||      //
+    function(callback){
         window.setTimeout(callback, 1000 / 120);
     };
 })();
+
+function aniSelection(square, ctx, dx, lastTime, dir) {
+  
+  if (dir == null) {
+    dir = "out";
+  }
+  
+  if (dx == null) {
+    dx = 0;
+  }
+  
+  if (lastTime == null) {
+    lastTime = 0;
+  }
+
+  var date = new Date();
+  var time = date.getTime();
+  var timeDiff = time - lastTime;
+  //console.log(time + ", " + lastTime + " [" + timeDiff + "]");
+  
+  if (timeDiff > 15) {
+    //console.log("dir: " + dir + ", dx: " + dx);
+    if (dir == "out") {
+      ++dx;
+      //console.log(">>>> " + dx);
+      if (dx > 9) {
+        dir = "in";
+      }
+    } else {
+      --dx;
+      //console.log("<<<< " + dx);
+      if (dx < 1) {
+        dir = "out";
+      }
+    }
+    lastTime = time;
+    ctx.clearRect(0,0,ctx.canvas.width,ctx.canvas.height);
+  }
+  
+  var x = square.x,
+      y = square.y,
+      w = square.size.wide,
+      h = square.size.tall;
+  
+    ctx.beginPath();
+    ctx.strokeStyle = "rgb(255,255,255)";
+    ctx.lineWidth = 1;
+    ctx.strokeRect(square.x-dx, square.y-dx, square.size.wide+(2*dx), square.size.tall+(2*dx));
+    
+  
+    requestAnimFrame(function(){
+      aniSelection(square, ctx, dx, lastTime, dir);
+    });
+}
 
 
 function aniMoveChecker(checker, square) {

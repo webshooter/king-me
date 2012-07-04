@@ -37,6 +37,15 @@ function Game() {
     new: function(options) {
       // options:
       //   canvasid:  String. Label for canvas element id.
+      //   position:  Object literal. Holds context
+      //              canvas element positon information
+      //              style: String. "relative" or "absolute"
+      //              left: Number. pixel position for left side
+      //              top: Number. pixel position for the element top
+      //   zindex:    Number. Index to assigne to the canvas element.
+      //              Only effective when position is specified. If
+      //              unspecified the default value will be set to
+      //              the current number of canvas elements.
       //   height:    Number. Canvas element height.
       //   width:     Number. Canvas element width.
       //   cssclass:  String. The name of a css class to apply
@@ -96,6 +105,16 @@ function Game() {
         }
       }
       return null;
+    },
+    item: function(index) {
+      if (index < _contexts.length) {
+        return _contexts[index].ctx;
+      }
+    },
+    top: function() {
+      if (_contexts.length > 0) {
+        return _contexts[_contexts.length-1].ctx;
+      }
     },
     count: function() {
       return _contexts.length;
@@ -163,12 +182,9 @@ function Game() {
     });
         
     this.render.board(this.contexts.get(_boardContext));
+    this.contexts.top().canvas.addEventListener("click", this.boardClick, true);
     
-    //this.contexts.get("gameboard").canvas.addEventListener("mousemove", this.hoverHighlight, false);
-    this.contexts.get("gameboard").canvas.addEventListener("click", this.boardClick, false);
-    //this.contexts.get("gameboard").canvas.addEventListener("mousedown", this.click, false);
-    
-    aniSelection(_board.getSquareById(15), this.contexts.get("fx"));
+    //aniSelection(_board.getSquareById(15), this.contexts.get("fx"));
   };
   
   this.startNew = function() { 
@@ -324,6 +340,9 @@ function Game() {
   };
   
   this.boardClick = function(e) {
+    var xd = new Date();
+    var xt = xd.getTime();
+    aniSelection(_board.getSquareById(15), game.contexts.get("fx"), 0, xt);
     var pt = new Point(e.clientX, e.clientY),
         currentSquare = _board.selectedSquare,
         controlState,
